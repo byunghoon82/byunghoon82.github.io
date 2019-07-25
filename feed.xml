@@ -1,0 +1,593 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Technical Blog</title>
+    <description>Enjoy Tech Life</description>
+    <link>https://byunghoon82.github.io/</link>
+    <atom:link href="https://byunghoon82.github.io/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Thu, 25 Jul 2019 14:42:24 +0900</pubDate>
+    <lastBuildDate>Thu, 25 Jul 2019 14:42:24 +0900</lastBuildDate>
+    <generator>Jekyll v3.6.3</generator>
+    
+      <item>
+        <title>IPTABLES 설정 방법</title>
+        <description>&lt;h3 id=&quot;설정-방법&quot;&gt;설정 방법&lt;/h3&gt;
+
+&lt;p&gt;기본 IPTALBE 초기화 방법&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;iptables -F
+iptables -X
+iptables -P INPUT DROP
+iptables -P OUTPUT DROP
+iptables -P FORWARD DROP
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;루프백 허용&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;iptables -A INPUT -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;외부 &amp;gt; 서버로 22번 포트 허용&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+iptables -A OUTPUT -p tcp --sport 22 -j ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;서버 &amp;gt; 외부로 22포트 허용&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;iptables -A INPUT -p tcp --sport 22 -j ACCEPT
+iptables -A OUTPUT -p tcp --dport 22 -j ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;외부 &amp;gt; 서버로 80번 포트 허용&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;iptables -A INPUT -p tcp  --dport 80 -j ACCEPT
+iptables -A OUTPUT -p tcp --sport 80 -j ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;DNS와의 통신이 허용 되어야만 외부망 접속이 가능&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;iptables -A INPUT -p udp --sport 53 -j ACCEPT
+iptables -A OUTPUT -p udp  --dport 53 -j ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;외부 &amp;gt; 서버로 5901번 포트 허용&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;iptables -A INPUT  -p tcp -m tcp --dport 5901 -j ACCEPT
+iptables -A OUTPUT -p tcp -m tcp --sport 5901 -j ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;scp를 이용하여 포트를 오픈할때 로그를 받는 서버에서 실행&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;iptables -A INPUT  -p tcp -m tcp --sport 2203 -j ACCEPT
+iptables -A OUTPUT - -p tcp -m tcp --dport 2203 -j ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;변경 규칙 저장&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;/etc/init.d/iptables save
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;규칙삭제&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;iptables -D INPUT 1 (몇번째 규칙 삭제)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;규칙확인&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;iptables -L -v
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;prerouting--postrouting-설정-방법&quot;&gt;PREROUTING / POSTROUTING 설정 방법&lt;/h3&gt;
+
+&lt;p&gt;PREROUTING은 패킷에서 목적지 IP를 변경하여 패킷을 특정 IP로 포워딩 할때 사용하며 내 자신의 PC에서 OUTPUT되는 패킷을 특정 PC 로 포워딩 하고 싶을때 사용한다.&lt;br /&gt;
+POSTROUTING은 패킷에서 보낸이 IP를 특정(사설/공인) IP로 변경하고 재전송한다.&lt;/p&gt;
+
+&lt;p&gt;먼저 FORWARDING 설정&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;sysctl -w net.ipv4.ip_forward=1
+sysctl -p /etc/sysctl.conf
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;아래 예제는 A서버에 APPLICATION이 운영되고 B서버에서 IPTABLES를 통해 포워딩이 이루어지고 불특정 다수의 사용자는 B서버를 통해 A서버로 접근할때 필요로 하는 설정으로
+PREROUTING에서는 불특정 사용자가 B라는 서버에 접근할때 목적지 IP를 A서버로 변경하였고 POSTROUTING을 통해 나가는 패킷을 MASQUERAD (불특정 다수)하였다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;iptables -A PREROUTING -t nat -p tcp  -d 호스트서버의아이피  --dport 포트번호 -j DNAT --to 포워딩내부아이피:포트번호
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;정책 설정 FORWARD는 모드 ACCEPT&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;iptables -A FORWARD -i ens1 -j ACCEPT
+iptables -A FORWARD -o ens1 -j ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;-i en3로 인/아웃되고 목적지가 -d 192.168.0.93인 패킷을 192.168.0.57로 포워딩&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;iptables -t nat -A PREROUTING -p tcp -i ens3 -d 192.168.0.93 -j DNAT --to 192.168.0.57
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;출발지가 -s destination.com인 패킷을 192.168.0.57로 포워딩&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;iptables -t nat -s destination.com -A PREROUTING -p tcp -j DNAT --to 192.168.0.57
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;-o eth0로 나가는 패킷이 내부망에서 인터넷 외부로 전송될때 MASQUERADE 옵션 설정, MASQURADE는 사설 IP로 공인 IP로 변경하는 옵션&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;prerouting--postrouting-관련-명령어&quot;&gt;PREROUTING / POSTROUTING 관련 명령어&lt;/h3&gt;
+
+&lt;p&gt;nat 테이블 등록&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;iptables -t nat -A POSTROUTING -s 192.168.2.0/24 -o eth0 -j MASQUERADE
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;nat 리스트보기&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;iptables -t nat -L -n
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;nat 테이블 모두 삭제&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;iptables -t nat -F
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;nat 테이블 2번째 POSTROUTING 정책 삭제&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;iptables -t nat -D POSTROUTING 2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;iptables 저장&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;service iptables save 
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        <pubDate>Fri, 12 Jul 2019 00:00:00 +0900</pubDate>
+        <link>https://byunghoon82.github.io/blog/2019/linux-iptables/</link>
+        <guid isPermaLink="true">https://byunghoon82.github.io/blog/2019/linux-iptables/</guid>
+        
+        <category>Linux</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>vi 개행문자 삭제 방법</title>
+        <description>&lt;p&gt;목적: 윈도우에서 Unix 계열로 텍스트 파일 전송 시 엔터가 있던 자리에 ^M이 표시된다. 윈도우는 \n\r이고, Unix는 \n 이기때문에 \r이 남아서 발생하는 문제이다.&lt;/p&gt;
+
+&lt;h3 id=&quot;vi-편집기를-이용한-제거-방법&quot;&gt;vi 편집기를 이용한 제거 방법&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;vi를 binary 편집 모드로 실행
+    &lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;# vi -b 파일명 
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+  &lt;li&gt;vi 명령 줄에 다음을 입력 후 엔터
+    &lt;pre&gt;&lt;code&gt;%s/^M//g
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;ul&gt;
+      &lt;li&gt;^ : ctrl + v&lt;/li&gt;
+      &lt;li&gt;M : ctrl + M&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;저장 후 vi 종료&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;명령어를-이용한-제거-방법&quot;&gt;명령어를 이용한 제거 방법&lt;/h3&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;# perl -pi -e 's/\r//g' [FileName] 
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        <pubDate>Thu, 11 Jul 2019 00:00:00 +0900</pubDate>
+        <link>https://byunghoon82.github.io/blog/2019/linux-newline-character/</link>
+        <guid isPermaLink="true">https://byunghoon82.github.io/blog/2019/linux-newline-character/</guid>
+        
+        <category>Linux</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>업데이트된 Original Repository와 Sync 실행하기</title>
+        <description>&lt;p&gt;Fork된 Repository에 업데이트된 Original Repository의 데이터를 반영하기 위한 방법이다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;먼저 Original Repository의 Branch를 확인하고 Fork된 Repository에도 동일한게 Branch를 생성한다.
+    &lt;ul&gt;
+      &lt;li&gt;Orignal Repository가 mater와 dev를 가지고 있다면&lt;/li&gt;
+      &lt;li&gt;Fork Repository도 marster와 dev를 가지고 있어어야 한다.&lt;/li&gt;
+      &lt;li&gt;동일한 branch에 데이터가 업데이트가 된다.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;다음을 실행한다.
+    &lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;# git remote -v
+# git remote add upstream https://github.com/original_owner/original_repository.git
+# git remote -v
+# git checkout master
+# git merge upstream/master
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Thu, 11 Jul 2019 00:00:00 +0900</pubDate>
+        <link>https://byunghoon82.github.io/blog/2019/git-sync-with-original-repo/</link>
+        <guid isPermaLink="true">https://byunghoon82.github.io/blog/2019/git-sync-with-original-repo/</guid>
+        
+        <category>Git</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>Splunk 설치 방법</title>
+        <description>&lt;ul&gt;
+  &lt;li&gt;목적: SIEM (Security Information Event Management) 중 널리 사용되고 있는 도구 확인&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;Splunk를&lt;br /&gt;
+https://api.slack.com/slack-apps&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;생성된 앱을 workspace에 인스톨한다.&lt;br /&gt;
+https://api.slack.com/apps/AGYR6MPMK/install-on-team?
+&lt;img src=&quot;/assets/post_images/slack/slack_1_1.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;앱을 생성하면 생성된 App의 auth token을 확인할 수 있다.
+    &lt;ul&gt;
+      &lt;li&gt;OAuth Access Token : xoxp- 으로 시작한다.&lt;/li&gt;
+      &lt;li&gt;Bot User OAuth Access Token: xoxb- 으로 시작한다.&lt;br /&gt;
+&lt;img src=&quot;/assets/post_images/slack/slack_1_2.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;워크스페이스에 추가하면 다음과 같이 채널에 앱이 추가된 것을 확인할 수 있다.&lt;br /&gt;
+&lt;img src=&quot;/assets/post_images/slack/slack_1_3.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;앱의 bot은 하기 앱의 bot 메뉴에서 제어할 수 있다.&lt;br /&gt;
+&lt;img src=&quot;/assets/post_images/slack/slack_1_4.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;curl을 이용한 워크스페이스/채널에 파일 업로드 방법
+    &lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;# curl -F file=@/file-name -F channels=#channel-name -H &quot;Authorization: Bearer xoxb-xxxx...&quot; https://slack.com/api/files.upload
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        <pubDate>Fri, 17 May 2019 00:00:00 +0900</pubDate>
+        <link>https://byunghoon82.github.io/blog/2019/splunk-installation/</link>
+        <guid isPermaLink="true">https://byunghoon82.github.io/blog/2019/splunk-installation/</guid>
+        
+        <category>SIEM</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>bot을 이용한 알람 설정 방법</title>
+        <description>&lt;ul&gt;
+  &lt;li&gt;목적: 특정 채널에 봇이 메세지를 제공하기 위해 auth token을 얻는 방법&lt;/li&gt;
+  &lt;li&gt;방법: 사용자가 slack 앱을 생성한 뒤 생성된 앱을 채널에 인스톨 하면 bot의 auth token을 얻을 수 있음&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;앱을 생성한다.&lt;br /&gt;
+https://api.slack.com/slack-apps&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;생성된 앱을 workspace에 인스톨한다.&lt;br /&gt;
+https://api.slack.com/apps/AGYR6MPMK/install-on-team?
+&lt;img src=&quot;/assets/post_images/slack/slack_1_1.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;앱을 생성하면 생성된 App의 auth token을 확인할 수 있다.
+    &lt;ul&gt;
+      &lt;li&gt;OAuth Access Token : xoxp- 으로 시작한다.&lt;/li&gt;
+      &lt;li&gt;Bot User OAuth Access Token: xoxb- 으로 시작한다.&lt;br /&gt;
+&lt;img src=&quot;/assets/post_images/slack/slack_1_2.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;워크스페이스에 추가하면 다음과 같이 채널에 앱이 추가된 것을 확인할 수 있다.&lt;br /&gt;
+&lt;img src=&quot;/assets/post_images/slack/slack_1_3.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;앱의 bot은 하기 앱의 bot 메뉴에서 제어할 수 있다.&lt;br /&gt;
+&lt;img src=&quot;/assets/post_images/slack/slack_1_4.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;curl을 이용한 워크스페이스/채널에 파일 업로드 방법
+    &lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;# curl -F file=@/file-name -F channels=#channel-name -H &quot;Authorization: Bearer xoxb-xxxx...&quot; https://slack.com/api/files.upload
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        <pubDate>Fri, 17 May 2019 00:00:00 +0900</pubDate>
+        <link>https://byunghoon82.github.io/blog/2019/slack-bot-alarm/</link>
+        <guid isPermaLink="true">https://byunghoon82.github.io/blog/2019/slack-bot-alarm/</guid>
+        
+        <category>Slack</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>iostat Usage</title>
+        <description>&lt;h3 id=&quot;iostat&quot;&gt;iostat&lt;/h3&gt;
+&lt;p&gt;디스크와 파티션을 위한 cpu 상태와 i/o 상태를 보고하는 툴이다.&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;%user&lt;/td&gt;
+      &lt;td&gt;유저레벨에서 실행되고 있는 프로세스의 퍼센티지&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;%nice&lt;/td&gt;
+      &lt;td&gt;우선순위 실행여부를 퍼센티지&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;%sys&lt;/td&gt;
+      &lt;td&gt;시스템 차원에서 실행되는 프로세스의 퍼센티지&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;%idle&lt;/td&gt;
+      &lt;td&gt;휴지시간(idle time)&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Device&lt;/td&gt;
+      &lt;td&gt;Device 컬럼은 디바이스명&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;tps&lt;/td&gt;
+      &lt;td&gt;디바이스를 초점에 맞추어 초당 전송속도의 수치&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Blk_read/s&lt;/td&gt;
+      &lt;td&gt;드라이브로부터 데이터를 읽어오는 양 / 초당 블록(block)의 수치&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Blk_write/s&lt;/td&gt;
+      &lt;td&gt;드라이브에 데이터를 쓰는 양 / 초당 블록(blocks per second)의 수치&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Blk_read&lt;/td&gt;
+      &lt;td&gt;읽혀진 블록의 총 수치&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Blk_wrtn&lt;/td&gt;
+      &lt;td&gt;쓰여진 블록의 총 수치&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;$ iostat -k -d /dev/sda -t 2 6
+Linux 2.6.18-8.el5 (protexip.co.kr)     03/12/2010      _x86_64_        (2 CPU)
+
+03/12/2010 02:02:10 PM
+Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+sda             527.31     51297.50       126.13  798899074    1964259
+
+03/12/2010 02:02:13 PM
+Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+sda             612.00      4386.00     30520.00       8772      61040
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;-k: 키로바이트당&lt;br /&gt;
+-d: 모니터링 할 파일시스템&lt;br /&gt;
+-t: 초당 디스플레이&lt;br /&gt;
+-6: 여섯번만 출력&lt;/p&gt;
+</description>
+        <pubDate>Thu, 16 May 2019 00:00:00 +0900</pubDate>
+        <link>https://byunghoon82.github.io/blog/2019/linux-iostat-usage/</link>
+        <guid isPermaLink="true">https://byunghoon82.github.io/blog/2019/linux-iostat-usage/</guid>
+        
+        <category>Linux</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>Java Convert Data</title>
+        <description>&lt;p&gt;–
+layout: post
+comments: true
+title: “Java 형 변환”
+date: 2019-05-12
+tags: Java
+—&lt;/p&gt;
+
+&lt;p&gt;int to String&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;String str = Integer.tostring(i);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;String to int&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;int i = Integer.parseInt(str);
+int i = Integer.valueOf(str).intValue();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;doulble to String&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;String str = Double.toString(d);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;long to String&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;String str = Long.toString(l);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;float to String&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;String str = Float.toString(f);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;String to double&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;double d = Double.valueOf(str).doubleValue();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;String to long&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;long l = Long.valueOf(str).longValue();
+long l = Long.parseLong(str);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;String to float&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;float f = Float.valueOf(str).floatValue();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;decimal to binary&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;String binstr = Integer.toBinaryString(i);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;decimal to hexadecimal&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;String hexstr = Integer.toString(i, 16);
+String hexstr = Integer.toHexString(i);
+Integer.toHexString( 0x10000 | i).substring(1).toUpperCase());
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;hexadecimal(String) to int&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;int i = Integer.valueOf(&quot;B8DA3&quot;, 16).intValue();
+int i = Integer.parseInt(&quot;B8DA3&quot;, 16);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ASCII Code to String&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;String char = new Character((char)i).toString();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Integer to ASCII Code&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;int i = (int) c;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Integer to boolean&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;boolean b = (i != 0);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;boolean to Integer&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;int i = (b)? 1 : 0;
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        <pubDate>Thu, 16 May 2019 00:00:00 +0900</pubDate>
+        <link>https://byunghoon82.github.io/blog/2019/java-convert-data/</link>
+        <guid isPermaLink="true">https://byunghoon82.github.io/blog/2019/java-convert-data/</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>RSA 공개 키 만들기</title>
+        <description>&lt;h3 id=&quot;사용방법&quot;&gt;사용방법&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;A 서버에서 키를 생성하여 B 서버로 카피&lt;/li&gt;
+  &lt;li&gt;A 서버에서 B로 접근할때 PASSWORD 입력 없이 접근&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;a-서버에서-공개-키-생성방법&quot;&gt;A 서버에서 공개 키 생성방법&lt;/h3&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;$ ssh-keygen -t rsa 
+
+Generating public/private rsa key pair. 
+Enter file in which to save the key (/root/.ssh/id_rsa): &amp;lt;ENTER&amp;gt; 
+Enter passphrase (empty for no passphrase): &amp;lt;ENTER&amp;gt; 
+Enter same passphrase again: &amp;lt;ENTER&amp;gt; 
+Your identification has been saved in /root/.ssh/id_rsa. 
+Your public key has been saved in /root/.ssh/id_rsa.pub. 
+The key fingerprint is: 
+b7:95:f7:a0:e1:52:01:d5:ec:48:e3:73:f7:45:40:46 root@machineA 
+
+
+$ cd ~/.ssh
+$ ls -l
+total 32 
+-rw------- 1 root root 883 Nov 07 11:41 id_rsa 
+-rw-r--r-- 1 root root 222 Nov 07 11:41 id_rsa.pub 
+-rw-r--r-- 1 root root 915 Nov 06 12:30 known_hosts 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;생성된 id_rsa.pub를 B서버의 .ssh 경로로 카피&lt;/p&gt;
+
+&lt;h3 id=&quot;b-서버-설정-방법&quot;&gt;B 서버 설정 방법&lt;/h3&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;$ cd ~/.ssh
+$ mv id_rsa.pub authorized_keys
+$ ls -l
+total 32 
+-rw------- 1 root root 883 Nov 07 11:41 authorized_keys 
+-rw-r--r-- 1 root root 915 Nov 06 12:30 known_hosts 
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        <pubDate>Wed, 15 May 2019 00:00:00 +0900</pubDate>
+        <link>https://byunghoon82.github.io/blog/2019/linux-rsa-key-creation/</link>
+        <guid isPermaLink="true">https://byunghoon82.github.io/blog/2019/linux-rsa-key-creation/</guid>
+        
+        <category>Linux</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>Git Usage</title>
+        <description>&lt;p&gt;commit 및 push 실행하기&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-ruby&quot;&gt;$ git clone https://github.com/byunghoon/repository_name
+$ git add *   or   git add &amp;lt;filename&amp;gt;
+$ git status
+$ git commit -m &quot;commit description&quot;
+$ git push origin master   or   git remote add origin &amp;lt;git hub address&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;로컬 프로젝트 생성 후 push 프로세스&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-ruby&quot;&gt;$ echo &quot;# snyk_analysis&quot; &amp;gt;&amp;gt; README.md
+$ git init
+$ git add README.md
+$ git commit -m &quot;first commit&quot;
+$ git remote add origin https://github.com/byunghoon82/snyk_analysis.git
+$ git push -u origin master
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;받아오는 프로세스&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;$ git pull
+$ git merge &amp;lt;branch&amp;gt;
+$ git add &amp;lt;filename&amp;gt;
+$ git diff &amp;lt;origin_branch&amp;gt; &amp;lt;compare_branch&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;파일 삭제 방법&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;$ git rm file_name
+$ git rm --cached -r _path/filename
+or 
+$ git rm --cached _path/filename
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;비밀번호 캐시에 저장 방법&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;$ git config credential.helper store
+$ git push https://github.com/byunghoon82/repository_name.git
+Username for 'https://github.com': &amp;lt;USERNANE&amp;gt;
+Password for 'https://USERNAME@github.com': &amp;lt;PASSWORD&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        <pubDate>Sun, 12 May 2019 00:00:00 +0900</pubDate>
+        <link>https://byunghoon82.github.io/blog/2019/git-usage/</link>
+        <guid isPermaLink="true">https://byunghoon82.github.io/blog/2019/git-usage/</guid>
+        
+        <category>Git</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>Lorem ipsum dolor sit</title>
+        <description>&lt;h1&gt;Lorem ipsum dolor sit amet, consectetuer adipiscing elit.&lt;/h1&gt;
+
+&lt;p&gt;&lt;strong&gt;Pellentesque habitant morbi tristique&lt;/strong&gt; senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. &lt;em&gt;Aenean ultricies mi vitae est.&lt;/em&gt; Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, &lt;code&gt;commodo vitae&lt;/code&gt;, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. &lt;a href=&quot;#&quot;&gt;Donec non enim&lt;/a&gt; in turpis pulvinar facilisis. Ut felis.&lt;/p&gt;
+
+&lt;h2&gt;Header Level 2&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Lorem ipsum dolor sit amet, consectetuer adipiscing elit.&lt;/li&gt;
+  &lt;li&gt;Aliquam tincidunt mauris eu risus.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;blockquote&gt;&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus magna. Cras in mi at felis aliquet congue. Ut a est eget ligula molestie gravida. Curabitur massa. Donec eleifend, libero at sagittis mollis, tellus est malesuada tellus, at luctus turpis elit sit amet quam. Vivamus pretium ornare est.&lt;/p&gt;&lt;/blockquote&gt;
+
+&lt;h3&gt;Header Level 3&lt;/h3&gt;
+
+&lt;h4&gt;Header Level 4&lt;/h4&gt;
+&lt;h5&gt;Header Level 5&lt;/h5&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Lorem ipsum dolor sit amet, consectetuer adipiscing elit.&lt;/li&gt;
+  &lt;li&gt;Aliquam tincidunt mauris eu risus.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-ruby&quot;&gt;#header h1 a {
+  display: block;
+  width: 300px;
+  height: 80px;
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        <pubDate>Thu, 26 Nov 2015 22:46:52 +0900</pubDate>
+        <link>https://byunghoon82.github.io/blog/2015/lorem-ipsum-dolor-sit/</link>
+        <guid isPermaLink="true">https://byunghoon82.github.io/blog/2015/lorem-ipsum-dolor-sit/</guid>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
+    
+  </channel>
+</rss>
