@@ -1,6 +1,4 @@
 ---
-layout: post
-comments: true
 title: "Java 형 변환"
 date: 2019-05-12
 tags: Java

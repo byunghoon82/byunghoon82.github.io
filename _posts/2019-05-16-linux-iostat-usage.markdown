@@ -1,6 +1,4 @@
 ---
-layout: post
-comments: true
 title: "iostat Usage"
 date: 2019-05-16
 tags: Linux

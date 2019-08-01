@@ -1,6 +1,4 @@
 ---
-layout: post
-comments: true
 title: "IPTABLES 설정 방법"
 date: 2019-07-12
 tags: Linux

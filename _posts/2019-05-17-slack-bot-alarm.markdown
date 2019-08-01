@@ -1,6 +1,4 @@
 ---
-layout: post
-comments: true
 title: "bot을 이용한 알람 설정 방법"
 date: 2019-05-17
 tags: Slack

@@ -1,6 +1,4 @@
 ---
-layout: post
-comments: true
 title: "Splunk 설치 방법"
 date: 2019-05-17
 tags: SIEM

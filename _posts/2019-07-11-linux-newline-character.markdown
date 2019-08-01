@@ -1,6 +1,4 @@
 ---
-layout: post
-comments: true
 title: "vi 개행문자 삭제 방법"
 date: 2019-07-11
 tags: Linux

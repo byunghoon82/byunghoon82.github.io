@@ -1,6 +1,4 @@
 ---
-layout: post
-comments: true
 title: "Git Usage"
 date: 2019-05-12
 tags: Git

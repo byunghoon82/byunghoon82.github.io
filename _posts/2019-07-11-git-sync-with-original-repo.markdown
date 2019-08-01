@@ -1,6 +1,4 @@
 ---
-layout: post
-comments: true
 title: "업데이트된 Original Repository와 Sync 실행하기"
 date: 2019-07-11
 tags: Git

@@ -1,6 +1,4 @@
 ---
-layout: post
-comments: true
 title: "RSA 공개 키 만들기"
 date: 2019-05-15
 tags: Linux
