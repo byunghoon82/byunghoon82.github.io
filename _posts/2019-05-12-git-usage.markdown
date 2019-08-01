@@ -1,0 +1,55 @@
+---
+layout: post
+comments: true
+title: "Git Usage"
+date: 2019-05-12
+tags: Git
+---
+  
+
+commit 및 push 실행하기
+```bash
+$ git clone https://github.com/byunghoon/repository_name
+$ git add *   or   git add <filename>
+$ git status
+$ git commit -m "commit description"
+$ git push origin master   or   git remote add origin <git hub address>
+```
+  
+  
+로컬 프로젝트 생성 후 push 프로세스
+```bash
+$ echo "# snyk_analysis" >> README.md
+$ git init
+$ git add README.md
+$ git commit -m "first commit"
+$ git remote add origin https://github.com/byunghoon82/snyk_analysis.git
+$ git push -u origin master
+```
+  
+
+받아오는 프로세스
+```bash
+$ git pull
+$ git merge <branch>
+$ git add <filename>
+$ git diff <origin_branch> <compare_branch>
+```
+  
+
+파일 삭제 방법
+```bash
+$ git rm file_name
+$ git rm --cached -r _path/filename
+or 
+$ git rm --cached _path/filename
+```
+  
+  
+비밀번호 캐시에 저장 방법
+```bash
+$ git config credential.helper store
+$ git push https://github.com/byunghoon82/repository_name.git
+Username for 'https://github.com': <USERNANE>
+Password for 'https://USERNAME@github.com': <PASSWORD>
+```
