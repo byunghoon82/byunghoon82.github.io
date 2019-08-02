@@ -39,9 +39,6 @@ author:
   location         : "Seoul, Korea"
   email            : "byunghoon82@gmail.com"
   links:
-    - label: "Email"
-      icon: "fas fa-at"
-      url: "mailto:byunghoon82@gmail.com"
     - label: "Homepage"
       icon: "fas fa-globe"
       url: "https://byunghoon82.github.io/"
