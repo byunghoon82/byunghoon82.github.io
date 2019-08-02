@@ -36,9 +36,11 @@ author:
   name             : "Byunghoon Park"
   avatar           : "/assets/images/bh.png"
   bio              : "Technical Support Engineer"
-  location         : "Seoul, Korea"
-  email            : "byunghoon82@gmail.com"
+  location         : "Seoul, Korea"  
   links:
+    - label: "Email"
+      icon: "fas fa-at"
+      url: "mailto:byunghoon82@gmail.com"
     - label: "Homepage"
       icon: "fas fa-globe"
       url: "https://byunghoon82.github.io/"
