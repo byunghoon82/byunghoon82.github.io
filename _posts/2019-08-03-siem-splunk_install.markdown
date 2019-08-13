@@ -25,7 +25,7 @@ http<s>://<splunk_address>:8000
 ```
 
 
-2. Splunk 데이터 입력 설정
+2. Splunk 데이터 입력 설정  
 다른 애플리케이션에서 데이터를 받기위한 설정이다.
 
 a. 설정 > 데이터 > TCP > 새 로컬 TCP
