@@ -8,10 +8,10 @@ Splunk는 여러 장비, 애플리케이션, 서버 등에서 제공하는 이�
 
 설치는 다음과 같은 방법으로 가능하다.
 
-1. Splunk 설치
-- Downlod: https://docs.splunk.com/Documentation/Splunk/7.2.3/Installation/InstallonLinux
+1. Splunk 설치  
+
+- Downlod: Splunk Enterprise 7.2.3 Download(https://docs.splunk.com/Documentation/Splunk/7.2.3/Installation/InstallonLinux)
 - Test Platform: Centos 7.x
-- Test Splunk Version: Splunk Enterprise 7.2.3
 - Command:
 ```bash
 rpm -i --replacepkgs --prefix=/splunkdirectory/ splunk_package_name.rpm
@@ -19,7 +19,10 @@ cd /splunkdirctory/bin
 ./splunk start --accept-license
 ./splunk enable boot-start (optional)
 ```
-- 설치완료 후 http<s>://<splunk_address>:8000로 접속
+- 설치완료 후 8000포트로 접속
+```html
+http<s>://<splunk_address>:8000
+```
 
 
 2. Splunk 데이터 입력 설정
