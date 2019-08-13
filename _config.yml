@@ -46,7 +46,10 @@ author:
       url: "https://byunghoon82.github.io/"
     - label: "GitHub"
       icon: "fab fa-github"
-      url: "https://github.com/byunghoon82"    
+      url: "https://github.com/byunghoon82"
+    - label: "Linkedin"
+      icon: "fa fa-linkedin"
+      url: "https://www.linkedin.com/in/byunghoon-park-60331170/"
 
 # Reading Files
 include:
