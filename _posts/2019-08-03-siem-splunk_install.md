@@ -10,7 +10,7 @@ Splunk는 여러 장비, 애플리케이션, 서버 등에서 제공하는 이�
 
 ### Splunk 설치  
 
-- Downlod: Splunk Enterprise 7.2.3 Download(https://docs.splunk.com/Documentation/Splunk/7.2.3/Installation/InstallonLinux)
+- Downlod: [Splunk Enterprise 7.2.3 Download](https://docs.splunk.com/Documentation/Splunk/7.2.3/Installation/InstallonLinux)
 - Test Platform: Centos 7.x
 - Command:
 ```bash
