@@ -20,7 +20,7 @@ Server Version: version.Info{Major:"1", Minor:"15", GitVersion:"v1.15.3", GitCom
 
 
 ## 설치방법:
-CentOS 7 설정:
+- CentOS 7 설정:
 ```bash
 yum -y update
 
@@ -53,7 +53,7 @@ getenforce
 reboot
 ```
 
-Docker 설치:
+- Docker 설치:
 ```bash
 # docker가 설치되어 있다면 삭제
 yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine
@@ -73,7 +73,7 @@ systemctl start docker
 systemctl enable docker
 ```
 
-kubernetes 설치:
+- kubernetes 설치:
 ```bash
 # mater & worker 노드 공통
 
@@ -93,7 +93,7 @@ yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 systemctl enable kubelet && systemctl start kubelet
 ```
 
-mater만 실행:
+- mater만 실행:
 ```bash
 # flannel plugin 설치
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
@@ -119,7 +119,7 @@ cat /etc/hosts
 192.168.0.3 node2
 ```
 
-node1&2에서 실행:
+- node1&2에서 실행:
 ```bash   
 # master kubeam init를 통해 확인된 마지막 join 실행
 kubeadm join 192.168.0.2:6443 --token zf8jc1.2iplfnk2pqmycuro --discovery-token-ca-cert-hash sha256:15541a312fd53ce96bcee2759267cf8d1620cdb2840e928dd912fa21c95dc708 --ignore-preflight-errors=All
@@ -135,7 +135,7 @@ systemctl start kubelet
 systemctl enable kubelet
 ```
 
-쿠버네티스 동작 확인:
+- 쿠버네티스 동작 확인:
 ```bash
 kubectl get componentstatuses
 NAME                 STATUS    MESSAGE              ERROR
@@ -144,7 +144,7 @@ controller-manager   Healthy   ok
 etcd-0               Healthy   {"health": "true"}
 ```
 
-join 상태 확인:
+- join 상태 확인:
 ```bash
 kubectl get nodes
 NAME     STATUS     ROLES    AGE   VERSION
@@ -190,17 +190,16 @@ kubectl exec -it <pod_name> sh
 
 ## Issue Track:
 ### node에서 master에 연결하기 위한 kubeadm join 을 실행할때 다음 에러가 확인된다.
-메세지:
+- 메세지:
 ```bash
 [WARNING IsDockerSystemdCheck]: detected "cgroupfs" as the Docker cgroup driver. The recommended driver is "systemd". Please follow the guide at https://kubernetes.io/docs/setup/cri/
 ```
 
-해결방법:
-https://blog.naver.com/weplayicecream/221498635944
+- 해결방법: <https://blog.naver.com/weplayicecream/221498635944>
 
 
 ### systemctl start kubelet 및 #systemctl status kubelet을 실행 후 하기와 같은 시작 실패 메세지가 확인되는 경우
-메세지:
+- 메세지:
 ```bash
 systemctl status kubelet
 /usr/bin/kubelet $KUBELET_KUBECONFIG_ARGS $KUBELET_CONFIG_ARGS $KUBELET_KUBEADM_ARGS $KUBELET_EXTRA_ARGS
@@ -209,13 +208,13 @@ tail /var/log/message
 F0830 14:09:16.330525   22600 server.go:198] failed to load Kubelet config file /var/lib/kubelet/config.yaml, error failed to read kubelet config file "/var/lib/kubelet/config.yaml", error: open /var/lib/kubelet/config.yaml: no such file or directory
 ```
 
-해결방법:
-+ 마스터 노드: # kubeadm init 후 #systemctl start kubelet을 실행
-+ 워커 노드: 마스터 노드에 # kubeadm join 후 #systemctl start kubelet을 실행
+- 해결방법:
+  + 마스터 노드: # kubeadm init 후 #systemctl start kubelet을 실행
+  + 워커 노드: 마스터 노드에 # kubeadm join 후 #systemctl start kubelet을 실행
 
 
 ### node에서 master에 join을 할때 확인되는 메세지
-메세지:
+- 메세지:
 ```bash
 error execution phase preflight: [preflight] Some fatal errors occurred:
         [ERROR DirAvailable--etc-kubernetes-manifests]: /etc/kubernetes/manifests is not empty
@@ -223,24 +222,24 @@ error execution phase preflight: [preflight] Some fatal errors occurred:
         [ERROR FileAvailable--etc-kubernetes-pki-ca.crt]: /etc/kubernetes/pki/ca.crt already exists
 ```
 
-해결방법:
+- 해결방법:
 ```bash
 join 명령어에 --ignore-preflight-errors=All를 추가한다.
 https://github.com/kubernetes/kubeadm/issues/974
 ```
 
 ### join 할때 hang이 발생되었고 --v=2 추가로 원인 확인
-메세지:
+- 메세지:
 ```bash
 [preflight] Running pre-flight checks
 ```
 
-디버그방법:
+- 디버그방법:
 ```bash
 kubeadm join 121.166.116.23:6443 --token 8oiw4s.t3yb6ahtw3p66ulp     --discovery-token-ca-cert-hash sha256:8881506eeb30e6def27659d407580167eba36482cd80a90a42478b7bc24c61d2 --v=2
 ```
 
-메세지:
+- 메세지:
 ```bash
 I0830 14:40:30.903964    1707 token.go:199] [discovery] Trying to connect to API Server "121.166.116.23:6443"
 I0830 14:40:30.904680    1707 token.go:74] [discovery] Created cluster-info discovery client, requesting info from "https://121.166.116.23:6443"
@@ -248,20 +247,20 @@ I0830 14:40:30.933320    1707 token.go:140] [discovery] Requesting info from "ht
 I0830 14:40:30.950202    1707 token.go:146] [discovery] Failed to request cluster info, will try again: [Get https://121.166.116.23:6443/api/v1/namespaces/kube-public/configmaps/cluster-info: x509: certificate is valid for 10.96.0.1, 192.168.0.39, not 121.166.116.23]
 ```
 
-해결방법:
-+ mater: 공인:121.166.116.23 / Private: 192.168.0.39
-+ node: 다른 네트워크 
+- 해결방법:
+  + mater: 공인:121.166.116.23 / Private: 192.168.0.39
+  + node: 다른 네트워크 
 이 경우 master는 192.168.0.x 대역으로 운영되며 해당 대역에 대하여 인증서가 유효하나 같은 네트워크 망이 아닌 다른 네트워크 망에서 공인IP로 접속을 시도하여 발생되는 문제
 같은 망에서 접속이 필요함
 
 
 ### systemctl status kubelet 으로 상태 학인시
-메세지:
+- 메세지:
 ```bash
 Sep 04 11:47:30 master kubelet[8909]: E0904 11:47:30.202073    8909 kubelet.go:2248] node "master" not found
 ```
 
-해결방법:
+- 해결방법:
 master를 /etc/hosts에 추가
 ```bash
 # cat /hosts
@@ -302,9 +301,8 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documen
 ```
 
 ### flannel을 통한 pod간 통신
-- 문서:
-https://crystalcube.co.kr/198
-https://likefree.tistory.com/17
+- 문서: <https://crystalcube.co.kr/198>  
+<https://likefree.tistory.com/17>
 
 ### kubectl describe pod <pod_name> 실행 시 메세지 확인
 - 메세지:
@@ -321,10 +319,10 @@ kubeadm init --pod-network-cidr 10.244.0.0/16
 ```
 
 ## 참고사이트:
-- Kubernetes 설치: https://futurecreator.github.io/2019/02/25/kubernetes-cluster-on-google-compute-engine-for-developers/  
-- Kubernetes 이론: https://subicura.com/2019/05/19/kubernetes-basic-1.html  
-- kubernetes 명령어: https://zzsza.github.io/development/2019/01/11/kubernetes-and-deployment/  
-- kubenetes taints and tolerations: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/  
-https://arisu1000.tistory.com/27846
-- kubernetes에서 사용하지 않는 이미지 삭제 방법: https://www.ibm.com/support/knowledgecenter/en/SSBS6K_3.1.1/manage_images/remove_image.html  
-https://stackoverflow.com/questions/51395040/manually-deleting-unused-images-on-kubernetes-gke
+- Kubernetes 설치: <https://futurecreator.github.io/2019/02/25/kubernetes-cluster-on-google-compute-engine-for-developers/>
+- Kubernetes 이론: <https://subicura.com/2019/05/19/kubernetes-basic-1.html>
+- kubernetes 명령어: <https://zzsza.github.io/development/2019/01/11/kubernetes-and-deployment/>
+- kubenetes taints and tolerations: <https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/>
+<https://arisu1000.tistory.com/27846>
+- kubernetes에서 사용하지 않는 이미지 삭제 방법: <https://www.ibm.com/support/knowledgecenter/en/SSBS6K_3.1.1/manage_images/remove_image.html>  
+<https://stackoverflow.com/questions/51395040/manually-deleting-unused-images-on-kubernetes-gke>
