@@ -190,17 +190,17 @@ kubectl exec -it <pod_name> sh
 
 ## Issue Track:
 ### node에서 master에 연결하기 위한 kubeadm join 을 실행할때 다음 에러가 확인된다.
-- 메세지:
+메세지:  
 ```bash
 [WARNING IsDockerSystemdCheck]: detected "cgroupfs" as the Docker cgroup driver. The recommended driver is "systemd". Please follow the guide at https://kubernetes.io/docs/setup/cri/
 ```
 
-- 해결방법: 
+해결방법:   
   + <https://blog.naver.com/weplayicecream/221498635944>
 
 
 ### systemctl start kubelet 및 #systemctl status kubelet을 실행 후 하기와 같은 시작 실패 메세지가 확인되는 경우
-- 메세지:  
+메세지:  
 ```bash
 systemctl status kubelet
 /usr/bin/kubelet $KUBELET_KUBECONFIG_ARGS $KUBELET_CONFIG_ARGS $KUBELET_KUBEADM_ARGS $KUBELET_EXTRA_ARGS
@@ -209,13 +209,13 @@ tail /var/log/message
 F0830 14:09:16.330525   22600 server.go:198] failed to load Kubelet config file /var/lib/kubelet/config.yaml, error failed to read kubelet config file "/var/lib/kubelet/config.yaml", error: open /var/lib/kubelet/config.yaml: no such file or directory
 ```
 
-- 해결방법:
-  + 마스터 노드: # kubeadm init 후 #systemctl start kubelet을 실행
-  + 워커 노드: 마스터 노드에 # kubeadm join 후 #systemctl start kubelet을 실행
+해결방법:  
++ 마스터 노드: # kubeadm init 후 #systemctl start kubelet을 실행
++ 워커 노드: 마스터 노드에 # kubeadm join 후 #systemctl start kubelet을 실행
 
 
 ### node에서 master에 join을 할때 확인되는 메세지
-- 메세지:
+메세지:  
 ```bash
 error execution phase preflight: [preflight] Some fatal errors occurred:
         [ERROR DirAvailable--etc-kubernetes-manifests]: /etc/kubernetes/manifests is not empty
@@ -223,24 +223,24 @@ error execution phase preflight: [preflight] Some fatal errors occurred:
         [ERROR FileAvailable--etc-kubernetes-pki-ca.crt]: /etc/kubernetes/pki/ca.crt already exists
 ```
 
-- 해결방법:
+해결방법:  
 ```bash
 join 명령어에 --ignore-preflight-errors=All를 추가한다.
 https://github.com/kubernetes/kubeadm/issues/974
 ```
 
 ### join 할때 hang이 발생되었고 --v=2 추가로 원인 확인
-- 메세지:
+메세지:  
 ```bash
 [preflight] Running pre-flight checks
 ```
 
-- 디버그방법:
+디버그방법:  
 ```bash
 kubeadm join 121.166.116.23:6443 --token 8oiw4s.t3yb6ahtw3p66ulp     --discovery-token-ca-cert-hash sha256:8881506eeb30e6def27659d407580167eba36482cd80a90a42478b7bc24c61d2 --v=2
 ```
 
-- 메세지:
+메세지:  
 ```bash
 I0830 14:40:30.903964    1707 token.go:199] [discovery] Trying to connect to API Server "121.166.116.23:6443"
 I0830 14:40:30.904680    1707 token.go:74] [discovery] Created cluster-info discovery client, requesting info from "https://121.166.116.23:6443"
@@ -248,20 +248,20 @@ I0830 14:40:30.933320    1707 token.go:140] [discovery] Requesting info from "ht
 I0830 14:40:30.950202    1707 token.go:146] [discovery] Failed to request cluster info, will try again: [Get https://121.166.116.23:6443/api/v1/namespaces/kube-public/configmaps/cluster-info: x509: certificate is valid for 10.96.0.1, 192.168.0.39, not 121.166.116.23]
 ```
 
-- 해결방법:
-  + mater: 공인:121.166.116.23 / Private: 192.168.0.39
-  + node: 다른 네트워크 / 이 경우 master는 192.168.0.x 대역으로 운영되며 해당 대역에 대하여 인증서가 유효하나 같은 네트워크 망이 아닌 다른 네트워크 망에서 공인IP로 접속을 시도하여 발생되는 문제
+해결방법:  
++ mater: 공인:121.166.116.23 / Private: 192.168.0.39
++ node: 다른 네트워크 / 이 경우 master는 192.168.0.x 대역으로 운영되며 해당 대역에 대하여 인증서가 유효하나 같은 네트워크 망이 아닌 다른 네트워크 망에서 공인IP로 접속을 시도하여 발생되는 문제
 같은 망에서 접속이 필요함
 
 
 ### systemctl status kubelet 으로 상태 학인시
-- 메세지:
+메세지:  
 ```bash
 Sep 04 11:47:30 master kubelet[8909]: E0904 11:47:30.202073    8909 kubelet.go:2248] node "master" not found
 ```
 
-- 해결방법:
-master를 /etc/hosts에 추가
+해결방법:    
+master를 /etc/hosts에 추가  
 ```bash
 # cat /hosts
 127.0.0.1   master localhost localhost.localdomain localhost4 localhost4.localdomain4
@@ -272,12 +272,12 @@ master를 /etc/hosts에 추가
 ```
 
 ### kubectl get nodes 실행 시 메세지 확인
-- 메세지:
+메세지:  
 ```bash
 The connection to the server localhost:8080 was refused - did you specify the right host or port?
 ```
 
-- 해결방법:
+해결방법:  
 ```bash
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
@@ -288,33 +288,33 @@ systemctl start kubelet
 ```
 
 ### systemctl status kubelet 실행 시 메세지 확인
-- 메세지:
+메세지:  
 ```bash
 Sep 06 02:50:28 node1 kubelet[2843]: W0906 02:50:28.954189    2843 cni.go:213] Unable to update cni config: No networks found in /etc/cni/net.d
 Sep 06 02:50:29 node1 kubelet[2843]: E0906 02:50:29.842812    2843 kubelet.go:2169] Container runtime network not ready: NetworkReady=false 
 ```
 
-- 해결방법: 
+해결방법:  
 ```bash
 # https://github.com/kubernetes/kubeadm/issues/1031
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 ```
 
 ### flannel을 통한 pod간 통신
-- 문서: 
-  + <https://crystalcube.co.kr/198>  
-  + <https://likefree.tistory.com/17>
+문서:  
++ <https://crystalcube.co.kr/198>  
++ <https://likefree.tistory.com/17>
 
 ### kubectl describe pod <pod_name> 실행 시 메세지 확인
-- 메세지:
+메세지:  
 ```bash
 Warning  FailedCreatePodSandBox  36m                 kubelet, node2     Failed create pod sandbox: rpc error: code = Unknown desc = failed to set up sandbox container "2eb830c0c80e5077b9a6409a4f54b7c32524c58bc7cdbe9780b58736bac7c1fc" network for pod "nginx-55bc597fbf-kq5q6": NetworkPlugin cni failed to set up pod "nginx-55bc597fbf-kq5q6_default" network: open /run/flannel/subnet.env: no such file or directory
 ```
 
-- 원인:
-master 노드에 flannel 플러그인 설치 후 pod간 통신에 필요한 네트워크를 kubeadm init 실행 시 정의하지 않음
+원인:  
+master 노드에 flannel 플러그인 설치 후 pod간 통신에 필요한 네트워크를 kubeadm init 실행 시 정의하지 않음  
 
-- 해결방법: 
+해결방법:  
 ```bash
 kubeadm init --pod-network-cidr 10.244.0.0/16
 ```
