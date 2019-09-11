@@ -320,15 +320,15 @@ kubeadm init --pod-network-cidr 10.244.0.0/16
 ```
 
 ## 참고사이트:
-- Kubernetes 설치: 
-  + <https://futurecreator.github.io/2019/02/25/kubernetes-cluster-on-google-compute-engine-for-developers/>
-- Kubernetes 이론: 
-  + <https://subicura.com/2019/05/19/kubernetes-basic-1.html>
-- kubernetes 명령어: 
-  + <https://zzsza.github.io/development/2019/01/11/kubernetes-and-deployment/>
-- kubenetes taints and tolerations: 
-  + <https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/>  
-  + <https://arisu1000.tistory.com/27846>
-- kubernetes에서 사용하지 않는 이미지 삭제 방법: 
-  + <https://www.ibm.com/support/knowledgecenter/en/SSBS6K_3.1.1/manage_images/remove_image.html>  
-  + <https://stackoverflow.com/questions/51395040/manually-deleting-unused-images-on-kubernetes-gke>
+Kubernetes 설치:  
++ <https://futurecreator.github.io/2019/02/25/kubernetes-cluster-on-google-compute-engine-for-developers/>
+Kubernetes 이론:  
++ <https://subicura.com/2019/05/19/kubernetes-basic-1.html>
+kubernetes 명령어:  
++ <https://zzsza.github.io/development/2019/01/11/kubernetes-and-deployment/>
+kubenetes taints and tolerations:  
++ <https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/>  
++ <https://arisu1000.tistory.com/27846>
+kubernetes에서 사용하지 않는 이미지 삭제 방법:  
++ <https://www.ibm.com/support/knowledgecenter/en/SSBS6K_3.1.1/manage_images/remove_image.html>  
++ <https://stackoverflow.com/questions/51395040/manually-deleting-unused-images-on-kubernetes-gke>
