@@ -43,4 +43,3 @@ tcp        0      0 0.0.0.0:514             0.0.0.0:*               LISTEN      
 
 ### splunk에서 결과 확인
 ![Alt text](/assets/post_images/splunk/splunk_1_3.png)
-
