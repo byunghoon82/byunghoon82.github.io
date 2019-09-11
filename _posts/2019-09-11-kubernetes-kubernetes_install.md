@@ -195,11 +195,12 @@ kubectl exec -it <pod_name> sh
 [WARNING IsDockerSystemdCheck]: detected "cgroupfs" as the Docker cgroup driver. The recommended driver is "systemd". Please follow the guide at https://kubernetes.io/docs/setup/cri/
 ```
 
-- 해결방법: <https://blog.naver.com/weplayicecream/221498635944>
+- 해결방법: 
+  + <https://blog.naver.com/weplayicecream/221498635944>
 
 
 ### systemctl start kubelet 및 #systemctl status kubelet을 실행 후 하기와 같은 시작 실패 메세지가 확인되는 경우
-- 메세지:
+- 메세지:  
 ```bash
 systemctl status kubelet
 /usr/bin/kubelet $KUBELET_KUBECONFIG_ARGS $KUBELET_CONFIG_ARGS $KUBELET_KUBEADM_ARGS $KUBELET_EXTRA_ARGS
@@ -249,8 +250,7 @@ I0830 14:40:30.950202    1707 token.go:146] [discovery] Failed to request cluste
 
 - 해결방법:
   + mater: 공인:121.166.116.23 / Private: 192.168.0.39
-  + node: 다른 네트워크 
-이 경우 master는 192.168.0.x 대역으로 운영되며 해당 대역에 대하여 인증서가 유효하나 같은 네트워크 망이 아닌 다른 네트워크 망에서 공인IP로 접속을 시도하여 발생되는 문제
+  + node: 다른 네트워크 / 이 경우 master는 192.168.0.x 대역으로 운영되며 해당 대역에 대하여 인증서가 유효하나 같은 네트워크 망이 아닌 다른 네트워크 망에서 공인IP로 접속을 시도하여 발생되는 문제
 같은 망에서 접속이 필요함
 
 
@@ -301,8 +301,9 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documen
 ```
 
 ### flannel을 통한 pod간 통신
-- 문서: <https://crystalcube.co.kr/198>  
-<https://likefree.tistory.com/17>
+- 문서: 
+  + <https://crystalcube.co.kr/198>  
+  + <https://likefree.tistory.com/17>
 
 ### kubectl describe pod <pod_name> 실행 시 메세지 확인
 - 메세지:
@@ -319,10 +320,15 @@ kubeadm init --pod-network-cidr 10.244.0.0/16
 ```
 
 ## 참고사이트:
-- Kubernetes 설치: <https://futurecreator.github.io/2019/02/25/kubernetes-cluster-on-google-compute-engine-for-developers/>
-- Kubernetes 이론: <https://subicura.com/2019/05/19/kubernetes-basic-1.html>
-- kubernetes 명령어: <https://zzsza.github.io/development/2019/01/11/kubernetes-and-deployment/>
-- kubenetes taints and tolerations: <https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/>
-<https://arisu1000.tistory.com/27846>
-- kubernetes에서 사용하지 않는 이미지 삭제 방법: <https://www.ibm.com/support/knowledgecenter/en/SSBS6K_3.1.1/manage_images/remove_image.html>  
-<https://stackoverflow.com/questions/51395040/manually-deleting-unused-images-on-kubernetes-gke>
+- Kubernetes 설치: 
+  + <https://futurecreator.github.io/2019/02/25/kubernetes-cluster-on-google-compute-engine-for-developers/>
+- Kubernetes 이론: 
+  + <https://subicura.com/2019/05/19/kubernetes-basic-1.html>
+- kubernetes 명령어: 
+  + <https://zzsza.github.io/development/2019/01/11/kubernetes-and-deployment/>
+- kubenetes taints and tolerations: 
+  + <https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/>  
+  + <https://arisu1000.tistory.com/27846>
+- kubernetes에서 사용하지 않는 이미지 삭제 방법: 
+  + <https://www.ibm.com/support/knowledgecenter/en/SSBS6K_3.1.1/manage_images/remove_image.html>  
+  + <https://stackoverflow.com/questions/51395040/manually-deleting-unused-images-on-kubernetes-gke>
