@@ -4,10 +4,6 @@ date: 2019-09-11
 tags: Kubernetes
 ---
 
-## 참고사이트:
-Kubernetes 설치: https://futurecreator.github.io/2019/02/25/kubernetes-cluster-on-google-compute-engine-for-developers/
-Kubernetes 이론: https://subicura.com/2019/05/19/kubernetes-basic-1.html
-kubernetes 명령어: https://zzsza.github.io/development/2019/01/11/kubernetes-and-deployment/
 
 ## 테스트환경:
 - Docker CE 18.09   
@@ -277,12 +273,12 @@ master를 /etc/hosts에 추가
 ```
 
 ### kubectl get nodes 실행 시 메세지 확인
-메세지:
+- 메세지:
 ```bash
 The connection to the server localhost:8080 was refused - did you specify the right host or port?
 ```
 
-해결방법:
+- 해결방법:
 ```bash
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
@@ -293,45 +289,42 @@ systemctl start kubelet
 ```
 
 ### systemctl status kubelet 실행 시 메세지 확인
-메세지:
+- 메세지:
 ```bash
 Sep 06 02:50:28 node1 kubelet[2843]: W0906 02:50:28.954189    2843 cni.go:213] Unable to update cni config: No networks found in /etc/cni/net.d
 Sep 06 02:50:29 node1 kubelet[2843]: E0906 02:50:29.842812    2843 kubelet.go:2169] Container runtime network not ready: NetworkReady=false 
 ```
 
-해결방법: 
+- 해결방법: 
 ```bash
 # https://github.com/kubernetes/kubeadm/issues/1031
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 ```
 
 ### flannel을 통한 pod간 통신
-문서:
+- 문서:
 https://crystalcube.co.kr/198
 https://likefree.tistory.com/17
 
 ### kubectl describe pod <pod_name> 실행 시 메세지 확인
-메세지:
+- 메세지:
 ```bash
 Warning  FailedCreatePodSandBox  36m                 kubelet, node2     Failed create pod sandbox: rpc error: code = Unknown desc = failed to set up sandbox container "2eb830c0c80e5077b9a6409a4f54b7c32524c58bc7cdbe9780b58736bac7c1fc" network for pod "nginx-55bc597fbf-kq5q6": NetworkPlugin cni failed to set up pod "nginx-55bc597fbf-kq5q6_default" network: open /run/flannel/subnet.env: no such file or directory
 ```
 
-원인:
+- 원인:
 master 노드에 flannel 플러그인 설치 후 pod간 통신에 필요한 네트워크를 kubeadm init 실행 시 정의하지 않음
 
-해결방법: 
+- 해결방법: 
 ```bash
 kubeadm init --pod-network-cidr 10.244.0.0/16
 ```
 
-
-### kubenetes taints and tolerations
-문서:
-https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+## 참고사이트:
+- Kubernetes 설치: https://futurecreator.github.io/2019/02/25/kubernetes-cluster-on-google-compute-engine-for-developers/  
+- Kubernetes 이론: https://subicura.com/2019/05/19/kubernetes-basic-1.html  
+- kubernetes 명령어: https://zzsza.github.io/development/2019/01/11/kubernetes-and-deployment/  
+- kubenetes taints and tolerations: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/  
 https://arisu1000.tistory.com/27846
-
-
-### kubernetes에서 사용하지 않는 이미지 삭제 방법
-https://www.ibm.com/support/knowledgecenter/en/SSBS6K_3.1.1/manage_images/remove_image.html
+- kubernetes에서 사용하지 않는 이미지 삭제 방법: https://www.ibm.com/support/knowledgecenter/en/SSBS6K_3.1.1/manage_images/remove_image.html  
 https://stackoverflow.com/questions/51395040/manually-deleting-unused-images-on-kubernetes-gke
-
