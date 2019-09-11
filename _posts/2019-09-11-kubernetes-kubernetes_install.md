@@ -20,7 +20,7 @@ Server Version: version.Info{Major:"1", Minor:"15", GitVersion:"v1.15.3", GitCom
 
 
 ## 설치방법:
-- CentOS 7 설정:
+CentOS 7 설정:
 ```bash
 yum -y update
 
@@ -53,7 +53,7 @@ getenforce
 reboot
 ```
 
-- Docker 설치:
+Docker 설치:
 ```bash
 # docker가 설치되어 있다면 삭제
 yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine
@@ -73,7 +73,7 @@ systemctl start docker
 systemctl enable docker
 ```
 
-- kubernetes 설치:
+kubernetes 설치:
 ```bash
 # mater & worker 노드 공통
 
@@ -93,7 +93,7 @@ yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 systemctl enable kubelet && systemctl start kubelet
 ```
 
-- mater만 실행:
+mater만 실행:
 ```bash
 # flannel plugin 설치
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
@@ -119,7 +119,7 @@ cat /etc/hosts
 192.168.0.3 node2
 ```
 
-- node1&2에서 실행:
+node1&2에서 실행:
 ```bash   
 # master kubeam init를 통해 확인된 마지막 join 실행
 kubeadm join 192.168.0.2:6443 --token zf8jc1.2iplfnk2pqmycuro --discovery-token-ca-cert-hash sha256:15541a312fd53ce96bcee2759267cf8d1620cdb2840e928dd912fa21c95dc708 --ignore-preflight-errors=All
@@ -135,7 +135,7 @@ systemctl start kubelet
 systemctl enable kubelet
 ```
 
-- 쿠버네티스 동작 확인:
+쿠버네티스 동작 확인:
 ```bash
 kubectl get componentstatuses
 NAME                 STATUS    MESSAGE              ERROR
@@ -144,7 +144,7 @@ controller-manager   Healthy   ok
 etcd-0               Healthy   {"health": "true"}
 ```
 
-- join 상태 확인:
+join 상태 확인:
 ```bash
 kubectl get nodes
 NAME     STATUS     ROLES    AGE   VERSION
