@@ -122,7 +122,7 @@ cat /etc/hosts
 node1&2에서 실행:
 ```bash   
 # master kubeam init를 통해 확인된 마지막 join 실행
-kubeadm join 192.168.0.2:6443 --token zf8jc1.2iplfnk2pqmycuro --discovery-token-ca-cert-hash sha256:15541a312fd53ce96bcee2759267cf8d1620cdb2840e928dd912fa21c95dc708 --ignore-preflight-errors=All
+kubeadm join 192.168.0.2:6443 --token <token_value> --discovery-token-ca-cert-hash sha256:<sha256_value> --ignore-preflight-errors=All
 
 # 일반 사용자가 kubectl을 사용할 수 있도록 설정
 mkdir -p $HOME/.kube
@@ -157,7 +157,7 @@ node2    NotReady   <none>   19s   v1.15.3
 ## kubernetes 명령어:
 Join 방법:
 ```bash
-kubeadm join 192.168.0.2:6443 --token zf8jc1.2iplfnk2pqmycuro --discovery-token-ca-cert-hash sha256:15541a312fd53ce96bcee2759267cf8d1620cdb2840e928dd912fa21c95dc708 --ignore-preflight-errors=All
+kubeadm join 192.168.0.2:6443 --token <token_value> --discovery-token-ca-cert-hash sha256:<token_value> --ignore-preflight-errors=All
 
 # Token 생성(확인)
 kubeadm token list
@@ -237,19 +237,19 @@ https://github.com/kubernetes/kubeadm/issues/974
 
 디버그방법:  
 ```bash
-kubeadm join 121.166.116.23:6443 --token 8oiw4s.t3yb6ahtw3p66ulp     --discovery-token-ca-cert-hash sha256:8881506eeb30e6def27659d407580167eba36482cd80a90a42478b7bc24c61d2 --v=2
+kubeadm join 121.166.116.23:6443 --token <token_value>  --discovery-token-ca-cert-hash sha256:<sha256_value> --v=2
 ```
 
 메세지:  
 ```bash
-I0830 14:40:30.903964    1707 token.go:199] [discovery] Trying to connect to API Server "121.166.116.23:6443"
-I0830 14:40:30.904680    1707 token.go:74] [discovery] Created cluster-info discovery client, requesting info from "https://121.166.116.23:6443"
-I0830 14:40:30.933320    1707 token.go:140] [discovery] Requesting info from "https://121.166.116.23:6443" again to validate TLS against the pinned public key
+I0830 14:40:30.903964    1707 token.go:199] [discovery] Trying to connect to API Server "121.166.111.11:6443"
+I0830 14:40:30.904680    1707 token.go:74] [discovery] Created cluster-info discovery client, requesting info from "https://121.166.111.11:6443"
+I0830 14:40:30.933320    1707 token.go:140] [discovery] Requesting info from "https://121.166.111.11:6443" again to validate TLS against the pinned public key
 I0830 14:40:30.950202    1707 token.go:146] [discovery] Failed to request cluster info, will try again: [Get https://121.166.116.23:6443/api/v1/namespaces/kube-public/configmaps/cluster-info: x509: certificate is valid for 10.96.0.1, 192.168.0.39, not 121.166.116.23]
 ```
 
 해결방법:  
-+ mater: 공인:121.166.116.23 / Private: 192.168.0.39
++ mater: 공인:121.166.111.11 / Private: 192.168.0.39
 + node: 다른 네트워크 / 이 경우 master는 192.168.0.x 대역으로 운영되며 해당 대역에 대하여 인증서가 유효하나 같은 네트워크 망이 아닌 다른 네트워크 망에서 공인IP로 접속을 시도하여 발생되는 문제
 같은 망에서 접속이 필요함
 
