@@ -186,6 +186,7 @@ kubectl logs <pod_name>
 kubectl delete namespace <namespace_name>
 kubectl delete -f <yml_file_name>.yml
 kubectl exec -it <pod_name> sh
+kubectl kubectl describe services <service_name>
 ```
 
 ## Issue Track:
@@ -319,6 +320,24 @@ master 노드에 flannel 플러그인 설치 후 pod간 통신에 필요한 네�
 kubeadm init --pod-network-cidr 10.244.0.0/16
 ```
 
+### kubectl get services를 실행하였을때 external ip가 <pending>인 경우
+
+원인:
+```bash
+kubectl get services
+NAME         TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+kubernetes   ClusterIP      10.96.0.1        <none>        443/TCP          12d
+my-service   LoadBalancer   10.108.240.218   <pending>     8080:32071/TCP   4m8s
+nginx        LoadBalancer   10.101.92.104    <pending>     80:32201/TCP     10d
+```
+
+해결방법:
+```bash
+#https://stackoverflow.com/questions/44110876/kubernetes-service-external-ip-pending
+#kubectl patch svc <svc-name> -n <namespace> -p '{"spec": {"type": "LoadBalancer", "externalIPs":["172.31.71.218"]}}'
+kubectl patch svc nginx -n default -p '{"spec": {"type": "LoadBalancer", "externalIPs":["192.168.0.4"]}}'
+```
+
 ## 참고사이트:
 - Kubernetes 설치:  
   + <https://futurecreator.github.io/2019/02/25/kubernetes-cluster-on-google-compute-engine-for-developers/>
@@ -332,3 +351,5 @@ kubeadm init --pod-network-cidr 10.244.0.0/16
 - kubernetes에서 사용하지 않는 이미지 삭제 방법:  
   + <https://www.ibm.com/support/knowledgecenter/en/SSBS6K_3.1.1/manage_images/remove_image.html>  
   + <https://stackoverflow.com/questions/51395040/manually-deleting-unused-images-on-kubernetes-gke>
+- 외부 IP 주소로 서비스 노출하는 방법:
+  + <https://kubernetes.io/ko/docs/tutorials/stateless-application/expose-external-ip-address/>
