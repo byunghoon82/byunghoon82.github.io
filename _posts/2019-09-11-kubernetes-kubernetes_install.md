@@ -320,7 +320,7 @@ master 노드에 flannel 플러그인 설치 후 pod간 통신에 필요한 네�
 kubeadm init --pod-network-cidr 10.244.0.0/16
 ```
 
-### kubectl get services를 실행하였을때 external ip가 <pending>인 경우
+### kubectl get services를 실행하였을때 EXTERNAL-IP가 pending인 경우
 
 원인:
 ```bash
